@@ -1,0 +1,14 @@
+#Options -Indexes
+
+#<Files .htaccess>
+#	Order allow,deny
+#	Deny from all
+#</Files>
+
+# Turn mod_rewrite on
+RewriteEngine On
+RewriteRule ^(.*)$ public/$1 [L]
+
+
+#RewriteCond %{HTTPS} !=on
+#RewriteRule .* https://%{SERVER_NAME}%{REQUEST_URI} [R,L]
