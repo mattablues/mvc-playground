@@ -25,6 +25,7 @@
     "require": {
         "vlucas/phpdotenv": "^5.2",
         "ext-pdo": "*",
-        "ext-gd": "*"
+        "ext-gd": "*",
+      "ext-http": "*"
     }
 }

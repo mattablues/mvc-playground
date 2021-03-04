@@ -9,18 +9,25 @@
      * Created at: 2021-03-01, 20:39
      */
 
+    use Core\Http\Request;
+    use Core\Router;
+
     require_once '../vendor/autoload.php';
 
-    use App\Application;
+    $router = new Router();
 
-    $app = new Application();
-
-    $app->router->get('/', function() {
-        return 'Hello World';
+// map homepage
+    $router->map('GET', '/', function() {
+        return 'hello succer';
     });
 
-    $app->router->get('/contact', function() {
-        return 'Contact';
-    });
+// dynamic named route
+/*    $router->map('GET|POST', '/users/[i:id]/', function($id) {
+        $user = .....
+  require __DIR__ . '/views/user/details.php';
+}, 'user-details');*/
 
-    $app->run();
+// echo URL to user-details page for ID 5
+    echo $router->generate('user-details', ['id' => 5]); // Output: "/users/5"
+
+var_dump($router);

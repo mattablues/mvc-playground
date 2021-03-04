@@ -26,7 +26,7 @@
         public function __construct() {
             $this->request = new Request();
             $this->response = new Response();
-            $this->router = new Router($this->request);
+            $this->router = new Router($this->request, $this->response);
         }
 
         protected array $routes = [];
