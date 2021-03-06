@@ -11,12 +11,23 @@
 
     namespace App\Controllers;
 
+    use Core\Controller;
+
     /**
      * Class SiteController
      * @package App\Controllers
      */
-    class SiteController {
+    class SiteController extends Controller {
+
         public function home() {
-            echo 'from tests';
+            echo 'home';
+        }
+
+        public function contact() {
+            echo 'contact';
+        }
+
+        public function shit() {
+            echo 'shit';
         }
     }

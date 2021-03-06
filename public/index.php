@@ -10,20 +10,24 @@
      */
 
 
+    use Core\Application;
+    use Core\Exceptions\MethodNotAllowedException;
+    use Core\Exceptions\NotFoundException;
+
     require_once '../vendor/autoload.php';
+    require_once '../routes/site.php';
+    require_once '../routes/auth.php';
+    require_once '../routes/user.php';
+    require_once '../routes/admin.php';
 
-    use Core\Route;
+    /** @var $rout */
 
-    $app = new \Core\Application();
+    $app = new Application(dirname(__DIR__));
 
-    // Add your first route
-    Route::add('/', function() {
-        return [\App\Controllers\SiteController::class, 'home'];
-    });
 
-// Add the first route
-    Route::add('/user/([0-9]*)/edit', function($id) {
-        echo 'Edit user with id '.$id.'<br>';
-    }, 'get');
-
-    Route::run('/');
+    try {
+        $rout->run('/');
+    }
+    catch(MethodNotAllowedException | NotFoundException $e) {
+        echo $e->getMessage();
+    }

@@ -18,15 +18,25 @@
      * @package Core
      */
     class Application {
-        public Route $router;
+        public static string $rootDir;
+        public static Application $app;
+        public Router $router;
         public Request $request;
+        public Controller|null $controller = null;
 
-        public function __construct() {
+        public function __construct(string $rootDir) {
+            self::$rootDir = $rootDir;
+            self::$app = $this;
+
             $this->request = new Request();
-            $this->router = new Route($this->request);
+            $this->router = new Router();
         }
 
-        public function run() {
-            $this->router->resolve();
+        public function getController() {
+            return $this->controller;
+        }
+
+        public function setController(Controller $controller) {
+            $this->controller = $controller;
         }
     }

@@ -14,48 +14,56 @@
     use Closure;
     use Core\Exceptions\MethodNotAllowedException;
     use Core\Exceptions\NotFoundException;
+    use Core\Middlewares\AdminMiddleware;
+    use Core\Middlewares\AuthMiddleware;
 
     /**
      * Class Router
      * @package Core
      */
-    class Route {
-        private static array $routes = [];
-        private static Closure|null $pathNotFound = null;
-        private static Closure|null $methodNotAllowed = null;
+    class Router {
+        private array $routes = [];
+        private Closure|null $pathNotFound = null;
+        private Closure|null $methodNotAllowed = null;
+        private array $allowedFilters = [
+            'csrf', 'auth', 'admin'
+        ];
 
         /**
          * Function used to add a new route
          * @param string $expression
-         * @param Closure $function
+         * @param Closure|string $callable
          * @param string|array $method
-         * @return void
+         * @param array|null $middleware
          */
-        public static function add(string $expression, Closure $function, string|array $method = 'get'): void{
-            array_push(self::$routes, [
+        public function add(string $expression, Closure|string $callable, string|array $method = 'get', ?array $middleware = null) {
+            array_push($this->routes, [
                 'expression' => $expression,
-                'function' => $function,
-                'method' => $method
+                'callable' => $callable,
+                'method' => $method,
             ]);
 
+            if(is_array($middleware)) {
+                $this->middlewares($middleware);
+            }
         }
 
         /**
          * Path not found
-         * @param $function
+         * @param $callable
          * @return void
          */
-        public static function pathNotFound($function) {
-            self::$pathNotFound = $function;
+        public function pathNotFound($callable) {
+            $this->pathNotFound = $callable;
         }
 
         /**
          * Method not allowed
-         * @param $function
+         * @param $callable
          * @return void
          */
-        public static function methodNotAllowed(Closure $function): void {
-            self::$methodNotAllowed = $function;
+        public  function methodNotAllowed(Closure $callable): void {
+            $this->methodNotAllowed = $callable;
         }
 
         /**
@@ -65,10 +73,8 @@
          * @param bool $trailingSlashMatters
          * @param bool $multimatch
          * @return void
-         * @throws MethodNotAllowedException
-         * @throws NotFoundException
          */
-        public static function run(string $basePath = '', bool $caseMatters = false, bool $trailingSlashMatters = false, bool $multimatch = false): void {
+        public function run(string $basePath = '', bool $caseMatters = false, bool $trailingSlashMatters = false, bool $multimatch = false): void {
 
             // The basePath never needs a trailing slash
             // Because the trailing slash will be added using the route expressions
@@ -106,8 +112,7 @@
 
             $routeMatchFound = false;
 
-            foreach(self::$routes as $route) {
-
+            foreach($this->routes as $route) {
                 // If the method matches check the path
 
                 // Add basePath to matching string
@@ -135,9 +140,10 @@
                                 array_shift($matches); // Remove basepath
                             }
 
-                            if($returnValue = call_user_func_array($route['function'], $matches)) {
+                            if($returnValue = call_user_func_array($route['callable'], $matches)) {
                                 echo $returnValue;
                             }
+
 
                             $routeMatchFound = true;
 
@@ -158,17 +164,56 @@
             if(!$routeMatchFound) {
                 // But a matching path exists
                 if($pathMatchFound) {
-                    if(self::$methodNotAllowed) {
-                        call_user_func_array(self::$methodNotAllowed, [$path,$method]);
-                        throw new MethodNotAllowedException();
+                    if($this->methodNotAllowed) {
+                        call_user_func_array($this->methodNotAllowed, [$path,$method]);
                     }
                 }
                 else {
-                    if(self::$pathNotFound) {
-                        call_user_func_array(self::$pathNotFound, [$path]);
-                        throw new NotFoundException();
+                    if($this->pathNotFound) {
+                        call_user_func_array($this->pathNotFound, [$path]);
                     }
                 }
             }
+        }
+
+        /**
+         * @param array $middlewares
+         * @return bool
+         */
+        function middlewares(array $middlewares) {
+            $middlewarePassed = [];
+
+
+            foreach($middlewares as $middleware) {
+                if(in_array($middleware, $this->allowedFilters)) {
+                    $middlewarePassed[] = $middleware;
+                }
+            }
+
+            $loggedin = true;
+
+            foreach($middlewarePassed as $middleware) {
+                if($middleware === 'auth') {
+                    $loggedin = false;
+                    AuthMiddleware::execute();
+                }
+                if($loggedin === true && $middleware === 'admin') {
+                    AdminMiddleware::execute();
+                }
+            }
+        }
+
+        /**
+         * @return mixed
+         */
+        protected function path(): mixed {
+            $path = $_SERVER['REQUEST_URI'] ?? '/';
+            $position = strpos($path, '?');
+
+            if($position === false) {
+                return $path;
+            }
+
+            return substr($path, 0, $position);
         }
     }

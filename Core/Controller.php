@@ -9,9 +9,16 @@
      * Created at: 2021-03-01, 20:43
      */
 
+    namespace Core;
+
+
     /**
      * Class Controller
      */
     class Controller {
+        protected string $layout = 'main';
+        public array $actions = [];
+
+
 
     }
