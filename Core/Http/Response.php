@@ -11,6 +11,7 @@
 
     namespace Core\Http;
 
+
     /**
      * Class Response
      * @package Core\Http

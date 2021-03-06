@@ -9,25 +9,22 @@
      * Created at: 2021-03-01, 20:39
      */
 
-    use Core\Http\Request;
-    use Core\Router;
 
     require_once '../vendor/autoload.php';
 
-    $router = new Router();
+    use Core\Router;
 
-// map homepage
-    $router->map('GET', '/', function() {
-        return 'hello succer';
+    $app = new \Core\Application();
+
+    // Add base route (startpage)
+    Router::add('/',function(){
+        echo 'Welcome :-)';
     });
 
-// dynamic named route
-/*    $router->map('GET|POST', '/users/[i:id]/', function($id) {
-        $user = .....
-  require __DIR__ . '/views/user/details.php';
-}, 'user-details');*/
 
-// echo URL to user-details page for ID 5
-    echo $router->generate('user-details', ['id' => 5]); // Output: "/users/5"
+    Router::add('/foo/([0-9]*)/bar',function($var1){
+        var_dump($_GET);
+        echo $var1.' is a great number!';
+    });
 
-var_dump($router);
+    Router::run('/');

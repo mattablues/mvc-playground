@@ -6,36 +6,27 @@
      * Project name: mvc-playground
      * Filename: Application.php
      * @author Mats Åkebrand <mats@akebrands.se>
-     * Created at: 2021-03-01, 20:17
+     * Created at: 2021-03-05, 13:06
      */
 
-    namespace App;
+    namespace Core;
 
     use Core\Http\Request;
-    use Core\Http\Response;
-    use Core\Router;
 
     /**
      * Class Application
+     * @package Core
      */
     class Application {
         public Router $router;
         public Request $request;
-        public Response $response;
 
         public function __construct() {
             $this->request = new Request();
-            $this->response = new Response();
-            $this->router = new Router($this->request, $this->response);
-        }
-
-        protected array $routes = [];
-
-        public function get($path, $callback) {
-            $this->routes['get'][$path] = $callback;
+            $this->router = new Router($this->request);
         }
 
         public function run() {
-            echo $this->router->resolve();
+            $this->router->resolve();
         }
     }

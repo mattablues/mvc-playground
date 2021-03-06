@@ -12,7 +12,8 @@
         "psr-4": {
             "App\\": "App/",
             "Core\\": "Core/"
-        }
+        },
+        "files": ["helpers/functions.php"]
     },
     "autoload-dev": {
         "psr-4": {
