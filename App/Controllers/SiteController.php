@@ -16,7 +16,7 @@
      * @package App\Controllers
      */
     class SiteController {
-        public function indexAction() {
+        public function home() {
             echo 'from tests';
         }
     }

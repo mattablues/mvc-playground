@@ -12,19 +12,18 @@
 
     require_once '../vendor/autoload.php';
 
-    use Core\Router;
+    use Core\Route;
 
     $app = new \Core\Application();
 
-    // Add base route (startpage)
-    Router::add('/',function(){
-        echo 'Welcome :-)';
+    // Add your first route
+    Route::add('/', function() {
+        return [\App\Controllers\SiteController::class, 'home'];
     });
 
+// Add the first route
+    Route::add('/user/([0-9]*)/edit', function($id) {
+        echo 'Edit user with id '.$id.'<br>';
+    }, 'get');
 
-    Router::add('/foo/([0-9]*)/bar',function($var1){
-        var_dump($_GET);
-        echo $var1.' is a great number!';
-    });
-
-    Router::run('/');
+    Route::run('/');
